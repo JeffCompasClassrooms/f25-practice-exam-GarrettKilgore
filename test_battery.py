@@ -148,3 +148,16 @@ def describe_battery_with_stubbed_monitor_behavior():
         assert ok is True
         assert partially_charged_battery.getCharge() == 35
         assert stub.drain_calls == [35]
+
+def test_drain_with_monitor_patch(mocker):
+    # Create a mock monitor and patch its notify_drain method
+    mock_monitor = mocker.Mock()
+    b = Battery(100, external_monitor=mock_monitor)
+    b.mCharge = 50
+
+    # Patch the notify_drain method on this mock
+    mock_monitor.notify_drain = mocker.Mock()
+
+    b.drain(20)  # should call notify_drain with 30
+
+    mock_monitor.notify_drain.assert_called_once_with(30)
